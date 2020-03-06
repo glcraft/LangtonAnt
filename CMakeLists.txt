@@ -17,4 +17,10 @@ target_link_libraries(LangtonAnt
     PRIVATE 
         GLEW::GLEW
         OpenGL
-        sfml-window)
+        sfml-window
+)
+target_include_directories(LangtonAnt PRIVATE "${CMAKE_SOURCE_DIR}/include")
+
+set_target_properties(LangtonAnt PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON)
