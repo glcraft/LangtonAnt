@@ -1,6 +1,6 @@
 #include <MainGame.h>
 #include <gl/glew.h>
-
+#include <MyException.h>
 void MainGame::init()
 {
     sf::ContextSettings();
