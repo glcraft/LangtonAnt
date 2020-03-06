@@ -93,7 +93,7 @@ void main()
         << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
     m_pos=m_tex.getSize()/2.f;
     m_t0=std::chrono::steady_clock::now();
-    m_dur=std::chrono::duration<float>(0.1);
+    m_dur=std::chrono::duration<float>(0.);
     reset();
 }
 void LangtonAnt::update()
@@ -157,7 +157,7 @@ void LangtonAnt::move(uint16_t* grid, glm::uvec2& pos, int8_t& dir)
     uint16_t& t=grid[pos.x+pos.y*(uint32_t)m_tex.getSize().x];
     dir+=m_lsDir[t++];
     if (t==m_lsDir.size()-1)
-        t=0;
+        t=1;
     if (dir>3)
         dir=0;
     else if (dir<0)
