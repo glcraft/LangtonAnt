@@ -22,9 +22,12 @@ void MainGame::display()
             if ((ev.type==sf::Event::KeyPressed && ev.key.code == sf::Keyboard::Escape) || ev.type == sf::Event::Closed)
                 m_window->close();
         }
-        glClear(GL_COLOR_BUFFER_BIT);
-        lant.update();
-        lant.draw();
-        m_window->display();
+        if (m_window->isOpen())
+        {
+            glClear(GL_COLOR_BUFFER_BIT);
+            lant.update();
+            lant.draw();
+            m_window->display();
+        }
     }
 }

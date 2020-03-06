@@ -1,4 +1,5 @@
 #include <LangtonAnt.h>
+#include <limits>
 LangtonAnt::LangtonAnt(uint32_t winWidth, uint32_t winHeight, uint8_t size) : m_size(size), m_winsize(winWidth, winHeight)
 {
     m_total = m_winsize.x * m_winsize.y / (m_size*m_size);
@@ -65,7 +66,7 @@ vec3 hsv2rgb(vec3 c) {
 void main()
 {
     float value=texture(tex, gl_FragCoord.xy/vec2(screenSize)).r;
-    if (value!=1.)
+    if (value!=0.)
         outColor=vec4(hsv2rgb(vec3(value*coef,1,1)), 1);
     else
         outColor=vec4(0,0,0,1);
@@ -90,11 +91,15 @@ void main()
         << gl::UniformStatic<int>("tex", 0)
         << gl::UniformStatic<float>("coef", (float)0xFFFF/(float)m_lsDir.size())
         << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
+    m_pos=m_tex.getSize()/2.f;
     reset();
 }
 void LangtonAnt::update()
 {
     m_PBO.bind();
+    auto ptr = m_PBO.map_readwrite();
+        move(ptr, m_pos, m_dir);
+    m_PBO.unmap();
     m_tex.bind();
     // m_tex.init_null(GL_R, GL_UNSIGNED_SHORT);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_tex.getSize().x, m_tex.getSize().y, GL_RED, GL_UNSIGNED_SHORT, 0);
@@ -113,12 +118,41 @@ void LangtonAnt::reset()
     m_PBO.bind();
     auto ptr = m_PBO.map_write();
     for(size_t i=0;i<m_total;++i)
-    {
-        if (rand()%4!=0)
-            ptr[i]=rand()%m_lsDir.size();
-        else
-            ptr[i]=0xFFFF;
-    }
+        ptr[i]=0;
     m_PBO.unmap();
     update();
+}
+void LangtonAnt::move(uint16_t* grid, glm::uvec2& pos, int8_t& dir)
+{
+    switch(dir)
+    {
+        case 0:
+            --pos.x;
+            break;
+        case 1:
+            --pos.y;
+            break;
+        case 2:
+            ++pos.x;
+            break;
+        case 3:
+            ++pos.y;
+            break;
+    }
+    auto tmax = std::numeric_limits<uint32_t>::max();
+    for(int i=0; i<pos.length();i++)
+    {
+        if (pos[i]==tmax)
+            pos[i]=m_tex.getSize()[i];
+        else if (pos[i]>m_tex.getSize()[i])
+            pos[i]=0;
+    }
+    uint16_t& t=grid[pos.x+pos.y*(uint32_t)m_tex.getSize().x];
+    dir+=m_lsDir[t++];
+    if (t==m_lsDir.size()-1)
+        t=0;
+    if (dir>3)
+        dir=0;
+    else if (dir<0)
+        dir=3;
 }

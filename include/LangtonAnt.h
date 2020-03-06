@@ -11,6 +11,7 @@ public:
     void draw();
 private:
     void reset();
+    void move(uint16_t* grid, glm::uvec2& pos, int8_t& dir);
     gl::Texture m_tex;
     gl::Buffer<GL_PIXEL_UNPACK_BUFFER, uint16_t> m_PBO;
     gl::ArrayBuffer<glm::vec2> m_VBO;
@@ -20,4 +21,6 @@ private:
     size_t m_total;
 
     std::vector<char> m_lsDir;
+    glm::uvec2 m_pos;
+    int8_t m_dir;
 };
