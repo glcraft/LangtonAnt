@@ -14,6 +14,9 @@ void MainGame::display()
 {
     LangtonAnt lant(m_window->getSize().x, m_window->getSize().y, 8);
     lant.init();
+    bool pause = true;
+    glClear(GL_COLOR_BUFFER_BIT);
+    m_window->display();
     while(m_window->isOpen())
     {
         sf::Event ev;
@@ -21,8 +24,10 @@ void MainGame::display()
         {
             if ((ev.type==sf::Event::KeyPressed && ev.key.code == sf::Keyboard::Escape) || ev.type == sf::Event::Closed)
                 m_window->close();
+            if (ev.type==sf::Event::KeyPressed && ev.key.code == sf::Keyboard::Space)
+                pause = !pause;
         }
-        if (m_window->isOpen())
+        if (m_window->isOpen() && !pause)
         {
             glClear(GL_COLOR_BUFFER_BIT);
             lant.update();
