@@ -13,7 +13,7 @@ void MainGame::init()
 }
 void MainGame::display()
 {
-    LangtonAnt lant(m_window->getSize().x, m_window->getSize().y, 8);
+    LangtonAnt lant(m_window->getSize().x, m_window->getSize().y, 2);
     lant.init();
     bool pause = true;
     glClear(GL_COLOR_BUFFER_BIT);

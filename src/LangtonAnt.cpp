@@ -90,7 +90,7 @@ void LangtonAnt::init()
     }
 
     m_lsDir.clear();
-    m_lsDir.resize(rand()%255);
+    m_lsDir.resize(rand()%1000);
     for(auto& dir : m_lsDir)
         dir=rand()%2?1:-1;
     m_shader 
@@ -100,7 +100,7 @@ void LangtonAnt::init()
         << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
     m_pos=m_tex.getSize()/2.f;
     m_t0=std::chrono::steady_clock::now();
-    m_dur=std::chrono::duration<float>(-2.);
+    m_dur=std::chrono::duration<float>(-5.);
     reset();
 }
 void LangtonAnt::update()
@@ -143,6 +143,7 @@ void LangtonAnt::reset()
     m_PBO.unmap();
     update();
 }
+
 void LangtonAnt::move(uint16_t* grid, glm::uvec2& pos, int8_t& dir)
 {
     switch(dir)
