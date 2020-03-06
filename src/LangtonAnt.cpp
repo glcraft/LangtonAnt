@@ -92,13 +92,20 @@ void main()
         << gl::UniformStatic<float>("coef", (float)0xFFFF/(float)m_lsDir.size())
         << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
     m_pos=m_tex.getSize()/2.f;
+    m_t0=std::chrono::steady_clock::now();
+    m_dur=std::chrono::duration<float>(0.1);
     reset();
 }
 void LangtonAnt::update()
 {
     m_PBO.bind();
     auto ptr = m_PBO.map_readwrite();
+    auto t = std::chrono::steady_clock::now();
+    if ((t-m_t0)>m_dur)
+    {
         move(ptr, m_pos, m_dir);
+        m_t0=std::chrono::steady_clock::now();
+    }
     m_PBO.unmap();
     m_tex.bind();
     // m_tex.init_null(GL_R, GL_UNSIGNED_SHORT);

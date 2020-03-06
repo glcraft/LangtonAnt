@@ -23,4 +23,6 @@ private:
     std::vector<char> m_lsDir;
     glm::uvec2 m_pos;
     int8_t m_dir;
+    std::chrono::duration<float> m_dur;
+    std::chrono::steady_clock::time_point m_t0;
 };
