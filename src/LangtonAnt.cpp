@@ -54,6 +54,7 @@ void main()
 #version 330 core
 uniform sampler2D tex;
 uniform uvec2 screenSize;
+uniform float coef;
 out vec4 outColor;
 
 vec3 hsv2rgb(vec3 c) {
@@ -61,13 +62,11 @@ vec3 hsv2rgb(vec3 c) {
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
-
-const float maximum = float(0xFFFF)/float(0x7FFF);
 void main()
 {
     float value=texture(tex, gl_FragCoord.xy/vec2(screenSize)).r;
     if (value!=1.)
-        outColor=vec4(hsv2rgb(vec3(value*maximum,1,1)), 1);
+        outColor=vec4(hsv2rgb(vec3(value*coef,1,1)), 1);
     else
         outColor=vec4(0,0,0,1);
 }
@@ -97,6 +96,7 @@ void LangtonAnt::draw()
     m_shader 
         << gl::sl::use
         << gl::UniformStatic<int>("tex", 0)
+        << gl::UniformStatic<float>("coef", (float)0xFFFF/(float)4)
         << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
     gl::Framebuffer::BindScreen();
     m_tex.bindTo(0);
@@ -109,7 +109,7 @@ void LangtonAnt::reset()
     for(size_t i=0;i<m_total;++i)
     {
         if (rand()%100<99)
-            ptr[i]=rand()%RAND_MAX;
+            ptr[i]=rand()%4;
         else
             ptr[i]=0xFFFF;
     }
