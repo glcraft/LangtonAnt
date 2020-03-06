@@ -10,21 +10,17 @@ void LangtonAnt::init()
         m_tex.instantiate();
         gl::Sampler::sptr s = std::shared_ptr<gl::Sampler>(new gl::Sampler);
         s->setFiltering(gl::Sampler::Nearest);
+        s->setWrap(gl::Sampler::ClampToEdge);
         m_tex.setSampler(s);
         m_tex.setTarget(GL_TEXTURE_2D);
-        m_tex.setFormat(GL_R);
+        m_tex.setFormat(GL_R16);
         m_tex.setSize({m_winsize.x/m_size, m_winsize.y/m_size});
-        m_tex.init_null(GL_R, GL_UNSIGNED_SHORT);
+        m_tex.init_null(GL_RED, GL_UNSIGNED_SHORT);
     }
     if (!m_PBO.id())
     {
         m_PBO.instantiate();
-        m_PBO.reserve(m_winsize.x * m_winsize.y / (m_size*m_size));
-    }
-    if (!m_FBO.id())
-    {
-        m_FBO.instantiate();
-        m_FBO.attachTexture(gl::Framebuffer::AttachColor0, m_tex, 0);
+        m_PBO.reserve(m_tex.getSize().x*m_tex.getSize().y);
     }
     if (!m_VBO.id())
     {
@@ -45,6 +41,7 @@ void LangtonAnt::init()
     {
         gl::sl::Shader<gl::sl::Vertex> vshad;
         gl::sl::Shader<gl::sl::Fragment> fshad;
+        try{
         vshad.set(R"(
 #version 330 core
 layout (location=0) in vec2 pos;
@@ -55,13 +52,34 @@ void main()
         )", false);
         fshad.set(R"(
 #version 330 core
+uniform sampler2D tex;
+uniform uvec2 screenSize;
 out vec4 outColor;
+
+vec3 hsv2rgb(vec3 c) {
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+const float maximum = float(0xFFFF)/float(0x7FFF);
 void main()
 {
-    outColor=vec4(1.);
+    float value=texture(tex, gl_FragCoord.xy/vec2(screenSize)).r;
+    if (value!=1.)
+        outColor=vec4(hsv2rgb(vec3(value*maximum,1,1)), 1);
+    else
+        outColor=vec4(0,0,0,1);
 }
         )", false);
-        m_shader << vshad << fshad << gl::sl::link;
+        
+            m_shader << vshad << fshad << gl::sl::link;
+        }
+        catch (gl::sl::CompileException exc)
+        {
+            std::cerr << exc.what();
+            throw;
+        }
     }
     reset();
 }
@@ -69,20 +87,32 @@ void LangtonAnt::update()
 {
     m_PBO.bind();
     m_tex.bind();
-    m_tex.init_null(GL_R, GL_UNSIGNED_SHORT);
+    // m_tex.init_null(GL_R, GL_UNSIGNED_SHORT);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_tex.getSize().x, m_tex.getSize().y, GL_RED, GL_UNSIGNED_SHORT, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
 }
 void LangtonAnt::draw()
 {
-    m_shader.use();
-    // m_FBO.bindTo(gl::Framebuffer::TargetDraw);
+    m_shader 
+        << gl::sl::use
+        << gl::UniformStatic<int>("tex", 0)
+        << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
     gl::Framebuffer::BindScreen();
+    m_tex.bindTo(0);
     m_VBO.draw(GL_TRIANGLE_FAN);
-    // m_FBO.blitToScreen({0,0,m_winsize/(uint32_t)m_size},{0,0,m_winsize},GL_COLOR_BUFFER_BIT, gl::Sampler::Nearest);
 }
 void LangtonAnt::reset()
 {
+    m_PBO.bind();
     auto ptr = m_PBO.map_write();
     for(size_t i=0;i<m_total;++i)
-        ptr[i]=0;
+    {
+        if (rand()%100<99)
+            ptr[i]=rand()%RAND_MAX;
+        else
+            ptr[i]=0xFFFF;
+    }
     m_PBO.unmap();
+    update();
 }

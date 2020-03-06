@@ -13,7 +13,6 @@ private:
     void reset();
     gl::Texture m_tex;
     gl::Buffer<GL_PIXEL_UNPACK_BUFFER, uint16_t> m_PBO;
-    gl::Framebuffer m_FBO;
     gl::ArrayBuffer<glm::vec2> m_VBO;
     gl::sl::Program m_shader;
     uint8_t m_size;
