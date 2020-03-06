@@ -18,4 +18,6 @@ private:
     uint8_t m_size;
     glm::uvec2 m_winsize;
     size_t m_total;
+
+    std::vector<char> m_lsDir;
 };

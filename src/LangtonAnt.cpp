@@ -80,6 +80,16 @@ void main()
             throw;
         }
     }
+
+    m_lsDir.clear();
+    m_lsDir.resize(rand()%255);
+    for(auto& dir : m_lsDir)
+        dir=rand()%2?1:-1;
+    m_shader 
+        << gl::sl::use
+        << gl::UniformStatic<int>("tex", 0)
+        << gl::UniformStatic<float>("coef", (float)0xFFFF/(float)m_lsDir.size())
+        << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
     reset();
 }
 void LangtonAnt::update()
@@ -93,11 +103,7 @@ void LangtonAnt::update()
 }
 void LangtonAnt::draw()
 {
-    m_shader 
-        << gl::sl::use
-        << gl::UniformStatic<int>("tex", 0)
-        << gl::UniformStatic<float>("coef", (float)0xFFFF/(float)4)
-        << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
+    m_shader << gl::sl::use;
     gl::Framebuffer::BindScreen();
     m_tex.bindTo(0);
     m_VBO.draw(GL_TRIANGLE_FAN);
@@ -108,8 +114,8 @@ void LangtonAnt::reset()
     auto ptr = m_PBO.map_write();
     for(size_t i=0;i<m_total;++i)
     {
-        if (rand()%100<99)
-            ptr[i]=rand()%4;
+        if (rand()%4!=0)
+            ptr[i]=rand()%m_lsDir.size();
         else
             ptr[i]=0xFFFF;
     }
