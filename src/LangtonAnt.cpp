@@ -159,8 +159,8 @@ void LangtonAnt::move(uint16_t* grid, glm::uvec2& pos, int8_t& dir)
     for(int i=0; i<pos.length();i++)
     {
         if (pos[i]==tmax)
-            pos[i]=m_tex.getSize()[i];
-        else if (pos[i]>m_tex.getSize()[i])
+            pos[i]=m_tex.getSize()[i]-1;
+        else if (pos[i]>=m_tex.getSize()[i])
             pos[i]=0;
     }
     uint16_t& t=grid[pos.x+pos.y*(uint32_t)m_tex.getSize().x];
