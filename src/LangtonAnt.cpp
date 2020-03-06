@@ -95,7 +95,7 @@ void LangtonAnt::init()
         << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
     m_pos=m_tex.getSize()/2.f;
     m_t0=std::chrono::steady_clock::now();
-    m_dur=std::chrono::duration<float>(0.);
+    m_dur=std::chrono::duration<float>(-2.);
     reset();
 }
 void LangtonAnt::update()
@@ -105,7 +105,14 @@ void LangtonAnt::update()
     auto t = std::chrono::steady_clock::now();
     if ((t-m_t0)>m_dur)
     {
-        move(ptr, m_pos, m_dir);
+        if (m_dur.count()<0)
+        {
+            size_t n=-m_dur.count()/0.01f;
+            for(int i=0;i<n;i++)
+                move(ptr, m_pos, m_dir);
+        }
+        else
+            move(ptr, m_pos, m_dir);
         m_t0=std::chrono::steady_clock::now();
     }
     m_PBO.unmap();
