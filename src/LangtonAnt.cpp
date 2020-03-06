@@ -34,6 +34,11 @@ LangtonAnt::LangtonAnt(uint32_t winWidth, uint32_t winHeight, uint8_t size) : m_
 {
     m_total = m_winsize.x * m_winsize.y / (m_size*m_size);
 }
+void LangtonAnt::setWindowSize(uint32_t winWidth, uint32_t winHeight)
+{
+    m_winsize = {winWidth,winHeight};
+    m_shader << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
+}
 void LangtonAnt::init()
 {
     if (!m_tex.id())

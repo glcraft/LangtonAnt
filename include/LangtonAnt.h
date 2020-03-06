@@ -9,6 +9,8 @@ public:
     void init();
     void update();
     void draw();
+
+    void setWindowSize(uint32_t winWidth, uint32_t winHeight);
 private:
     void reset();
     void move(uint16_t* grid, glm::uvec2& pos, int8_t& dir);

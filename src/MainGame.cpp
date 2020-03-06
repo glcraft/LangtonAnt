@@ -25,8 +25,13 @@ void MainGame::display()
         {
             if ((ev.type==sf::Event::KeyPressed && ev.key.code == sf::Keyboard::Escape) || ev.type == sf::Event::Closed)
                 m_window->close();
-            if (ev.type==sf::Event::KeyPressed && ev.key.code == sf::Keyboard::Space)
+            else if (ev.type==sf::Event::KeyPressed && ev.key.code == sf::Keyboard::Space)
                 pause = !pause;
+            else if (ev.type==sf::Event::Resized)
+            {
+                glViewport(0,0,m_window->getSize().x,m_window->getSize().y);
+                lant.setWindowSize(m_window->getSize().x,m_window->getSize().y);
+            }
         }
         if (m_window->isOpen() && !pause)
         {
