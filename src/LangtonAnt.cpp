@@ -30,7 +30,7 @@ void main()
         outColor=vec4(0,0,0,1);
 }
 )";
-LangtonAnt::LangtonAnt(uint32_t winWidth, uint32_t winHeight, uint8_t size) : m_size(size), m_winsize(winWidth, winHeight)
+LangtonAnt::LangtonAnt(uint32_t winWidth, uint32_t winHeight, uint8_t size) : m_size(size), m_winsize(winWidth, winHeight), m_dur(0)
 {
     m_total = m_winsize.x * m_winsize.y / (m_size*m_size);
 }
@@ -38,6 +38,10 @@ void LangtonAnt::setWindowSize(uint32_t winWidth, uint32_t winHeight)
 {
     m_winsize = {winWidth,winHeight};
     m_shader << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
+}
+void LangtonAnt::setDuration(float duration)
+{
+    m_dur=std::chrono::duration<float>(duration);
 }
 void LangtonAnt::init()
 {
@@ -100,7 +104,6 @@ void LangtonAnt::init()
         << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
     m_pos=m_tex.getSize()/2.f;
     m_t0=std::chrono::steady_clock::now();
-    m_dur=std::chrono::duration<float>(-5.);
     reset();
 }
 void LangtonAnt::update()
