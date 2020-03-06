@@ -4,6 +4,7 @@ project(LangtonAnt)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
+find_package(glm CONFIG REQUIRED)
 find_package(SFML COMPONENTS window CONFIG REQUIRED)
 
 file(GLOB PROJ_SRC
@@ -15,6 +16,7 @@ add_executable(LangtonAnt ${PROJ_SRC})
 
 target_link_libraries(LangtonAnt 
     PRIVATE 
+        glm
         GLEW::GLEW
         OpenGL
         sfml-window
@@ -24,3 +26,10 @@ target_include_directories(LangtonAnt PRIVATE "${CMAKE_SOURCE_DIR}/include")
 set_target_properties(LangtonAnt PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON)
+
+add_subdirectory(deps/libglw)
+
+target_link_libraries(LangtonAnt 
+    PRIVATE 
+        libglw
+)

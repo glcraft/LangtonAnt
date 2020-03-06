@@ -1,6 +1,7 @@
 #include <MainGame.h>
 #include <gl/glew.h>
 #include <MyException.h>
+#include <LangtonAnt.h>
 void MainGame::init()
 {
     sf::ContextSettings();
@@ -11,6 +12,8 @@ void MainGame::init()
 }
 void MainGame::display()
 {
+    LangtonAnt lant(m_window->getSize().x, m_window->getSize().y, 8);
+    lant.init();
     while(m_window->isOpen())
     {
         sf::Event ev;
@@ -18,8 +21,10 @@ void MainGame::display()
         {
             if ((ev.type==sf::Event::KeyPressed && ev.key.code == sf::Keyboard::Escape) || ev.type == sf::Event::Closed)
                 m_window->close();
-            glClear(GL_COLOR_BUFFER_BIT);
-            m_window->display();
         }
+        glClear(GL_COLOR_BUFFER_BIT);
+        lant.update();
+        lant.draw();
+        m_window->display();
     }
 }
