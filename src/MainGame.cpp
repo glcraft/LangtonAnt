@@ -17,7 +17,7 @@ void MainGame::display()
     LangtonAnt lant;
     lant.setConfiguration(m_conf);
     lant.init();
-    bool pause = true;
+    bool pause = false;
     glClear(GL_COLOR_BUFFER_BIT);
     m_window->display();
     while(m_window->isOpen())
