@@ -3,9 +3,19 @@
 
 Libraries used : `glew`, `SFML`, `nlohmann::json`, `GLM` and `libglw`.
 
-Every libraries except libglw are avalable in vcpkg.
+Every libraries except libglw are avalable in [vcpkg](https://github.com/microsoft/vcpkg).
 
-**Note** : in the CMakeCache.txt, make sure to put `LIBGLW_LIBRARY_ONLY` to `ON`.
+## Note installation
+
+Install dependencies with vcpkg.
+
+Get `libglw` by init git submodules.
+
+Configure the project via CMake.
+
+After CMake configuration, in the CMakeCache.txt, make sure to put `LIBGLW_LIBRARY_ONLY` to `ON`.
+
+Build.
 
 ## Configuration file
 
