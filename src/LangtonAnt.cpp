@@ -30,7 +30,7 @@ void main()
         outColor=vec4(0,0,0,1);
 }
 )";
-LangtonAnt::LangtonAnt(uint32_t winWidth, uint32_t winHeight, uint8_t size) : m_size(size), m_winsize(winWidth, winHeight), m_dur(0)
+LangtonAnt::LangtonAnt(uint32_t winWidth, uint32_t winHeight, uint8_t size) : m_size(size), m_winsize(winWidth, winHeight), m_dur(0), m_gen(m_rd()), m_dis(0,1000)
 {
     m_total = m_winsize.x * m_winsize.y / (m_size*m_size);
 }
@@ -42,6 +42,10 @@ void LangtonAnt::setWindowSize(uint32_t winWidth, uint32_t winHeight)
 void LangtonAnt::setDuration(float duration)
 {
     m_dur=std::chrono::duration<float>(duration);
+}
+void LangtonAnt::setMaxColor(uint32_t maxCol)
+{
+    m_dis = std::uniform_int_distribution<uint32_t>(1, maxCol);
 }
 void LangtonAnt::init()
 {
@@ -94,7 +98,7 @@ void LangtonAnt::init()
     }
 
     m_lsDir.clear();
-    m_lsDir.resize(rand()%1000);
+    m_lsDir.resize(random());
     for(auto& dir : m_lsDir)
         dir=rand()%2?1:-1;
     m_shader 
@@ -180,4 +184,8 @@ void LangtonAnt::move(uint16_t* grid, glm::uvec2& pos, int8_t& dir)
         dir=0;
     else if (dir<0)
         dir=3;
+}
+uint32_t LangtonAnt::random()
+{
+    return m_dis(m_gen);
 }
