@@ -1,0 +1,8 @@
+{
+    "winSize":{
+        "x":1920,
+        "y":1080
+    },
+    "duration":-10,
+    "maxColor": 8
+}
