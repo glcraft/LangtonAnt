@@ -45,7 +45,7 @@ void LangtonAnt::setDuration(float duration)
 }
 void LangtonAnt::setMaxColor(uint32_t maxCol)
 {
-    m_dis = std::uniform_int_distribution<uint32_t>(1, maxCol);
+    m_dis = std::uniform_int_distribution<uint32_t>(4, maxCol);
 }
 void LangtonAnt::init()
 {
