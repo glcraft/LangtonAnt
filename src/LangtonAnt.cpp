@@ -30,22 +30,32 @@ void main()
         outColor=vec4(0,0,0,1);
 }
 )";
-LangtonAnt::LangtonAnt(uint32_t winWidth, uint32_t winHeight, uint8_t size) : m_size(size), m_winsize(winWidth, winHeight), m_dur(0), m_gen(m_rd()), m_dis(0,1000)
+LangtonAnt::LangtonAnt() : m_gen(m_rd()), m_dis(0,m_config.maxColor)
 {
-    m_total = m_winsize.x * m_winsize.y / (m_size*m_size);
+    
+}
+void LangtonAnt::setConfiguration(Configuration conf)
+{
+    m_config = conf;
+    if (m_shader.id())
+        m_shader << gl::UniformRef<glm::uvec2>("screenSize", m_config.winSize);
+    m_dis = std::uniform_int_distribution<uint32_t>(4, m_config.maxColor);
 }
 void LangtonAnt::setWindowSize(uint32_t winWidth, uint32_t winHeight)
 {
-    m_winsize = {winWidth,winHeight};
-    m_shader << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
+    m_config.winSize = {winWidth,winHeight};
+    if (m_shader.id())
+        m_shader << gl::UniformRef<glm::uvec2>("screenSize", m_config.winSize);
 }
 void LangtonAnt::setDuration(float duration)
 {
-    m_dur=std::chrono::duration<float>(duration);
+    m_config.duration=duration;
+    // m_dur=std::chrono::duration<float>(duration);
 }
 void LangtonAnt::setMaxColor(uint32_t maxCol)
 {
-    m_dis = std::uniform_int_distribution<uint32_t>(4, maxCol);
+    m_config.maxColor = maxCol;
+    m_dis = std::uniform_int_distribution<uint32_t>(4, m_config.maxColor);
 }
 void LangtonAnt::init()
 {
@@ -58,7 +68,7 @@ void LangtonAnt::init()
         m_tex.setSampler(s);
         m_tex.setTarget(GL_TEXTURE_2D);
         m_tex.setFormat(GL_R16);
-        m_tex.setSize({m_winsize.x/m_size, m_winsize.y/m_size});
+        m_tex.setSize({m_config.winSize.x/m_config.sizePixel, m_config.winSize.y/m_config.sizePixel});
         m_tex.init_null(GL_RED, GL_UNSIGNED_SHORT);
     }
     if (!m_PBO.id())
@@ -105,7 +115,7 @@ void LangtonAnt::init()
         << gl::sl::use
         << gl::UniformStatic<int>("tex", 0)
         << gl::UniformStatic<float>("coef", (float)0xFFFF/(float)m_lsDir.size())
-        << gl::UniformRef<glm::uvec2>("screenSize", m_winsize);
+        << gl::UniformRef<glm::uvec2>("screenSize", m_config.winSize);
     m_pos=m_tex.getSize()/2.f;
     m_t0=std::chrono::steady_clock::now();
     reset();
@@ -115,11 +125,12 @@ void LangtonAnt::update()
     m_PBO.bind();
     auto ptr = m_PBO.map_readwrite();
     auto t = std::chrono::steady_clock::now();
-    if ((t-m_t0)>m_dur)
+    auto dur = std::chrono::duration<float>(m_config.duration);
+    if ((t-m_t0)>dur)
     {
-        if (m_dur.count()<0)
+        if (dur.count()<0)
         {
-            size_t n=-m_dur.count()/0.01f;
+            size_t n=-dur.count()/0.01f;
             for(int i=0;i<n;i++)
                 move(ptr, m_pos, m_dir);
         }
@@ -129,7 +140,6 @@ void LangtonAnt::update()
     }
     m_PBO.unmap();
     m_tex.bind();
-    // m_tex.init_null(GL_R, GL_UNSIGNED_SHORT);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_tex.getSize().x, m_tex.getSize().y, GL_RED, GL_UNSIGNED_SHORT, 0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
@@ -145,7 +155,8 @@ void LangtonAnt::reset()
 {
     m_PBO.bind();
     auto ptr = m_PBO.map_write();
-    for(size_t i=0;i<m_total;++i)
+    const size_t total = m_config.winSize.x * m_config.winSize.y / (m_config.sizePixel*m_config.sizePixel);
+    for(size_t i=0;i<total;++i)
         ptr[i]=0;
     m_PBO.unmap();
     update();

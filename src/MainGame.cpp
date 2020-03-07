@@ -2,10 +2,11 @@
 #include <gl/glew.h>
 #include <MyException.h>
 #include <LangtonAnt.h>
-void MainGame::init()
+void MainGame::init(Configuration conf)
 {
+    m_conf = conf;
     sf::ContextSettings();
-    m_window = std::unique_ptr<sf::Window>(new sf::Window(sf::VideoMode(1920, 1080, 8), "Langton Ant", 7, sf::ContextSettings(0,0,0,3,3,sf::ContextSettings::Core)));
+    m_window = std::unique_ptr<sf::Window>(new sf::Window(sf::VideoMode(conf.winSize.x, conf.winSize.y, 8), "Langton Ant", 7, sf::ContextSettings(0,0,0,3,3,sf::ContextSettings::Core)));
     m_window->setVerticalSyncEnabled(true);
     glewExperimental = true;
     if (int code=glewInit(); code!=GLEW_OK)
@@ -13,9 +14,8 @@ void MainGame::init()
 }
 void MainGame::display()
 {
-    LangtonAnt lant(m_window->getSize().x, m_window->getSize().y, 1);
-    lant.setMaxColor(10000);
-    lant.setDuration(-1000.f);
+    LangtonAnt lant;
+    lant.setConfiguration(m_conf);
     lant.init();
     bool pause = true;
     glClear(GL_COLOR_BUFFER_BIT);

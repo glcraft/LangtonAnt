@@ -5,6 +5,7 @@ project(LangtonAnt)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 find_package(SFML COMPONENTS window CONFIG REQUIRED)
 
 file(GLOB PROJ_SRC
@@ -20,6 +21,7 @@ target_link_libraries(LangtonAnt
         GLEW::GLEW
         OpenGL
         sfml-window
+        nlohmann_json::nlohmann_json
 )
 target_include_directories(LangtonAnt PRIVATE "${CMAKE_SOURCE_DIR}/include")
 
